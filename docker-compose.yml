@@ -1,0 +1,59 @@
+version: '3.3'
+
+services:
+
+  consul:
+    image: consul:1.15.4
+    command: agent -server -ui -node=server1 -bootstrap-expect=1 -client=0.0.0.0
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    networks:
+      - micro-service
+    expose:
+      - 8500
+      - 8600
+
+  client-one:
+    restart: on-failure
+    build:
+      context: client-one
+      dockerfile: Dockerfile
+    links:
+      - consul
+      - postgres
+    ports:
+      - "9900-9905:9900"
+    networks:
+      - micro-service
+    expose:
+      - 9900
+      - 9901
+      - 9902
+      - 9903
+      - 9904
+      - 9905
+
+  postgres:
+    image: postgres:14.1-alpine
+    restart: no
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=0624
+      - POSTGRES_DB=micro-one
+    ports:
+      - '5432:5432'
+    networks:
+      - micro-service
+    volumes:
+      - postgres:/data/postgres
+    expose:
+      - 5432
+
+networks:
+  micro-service:
+    driver: bridge
+
+volumes:
+  postgres:
+    external: false

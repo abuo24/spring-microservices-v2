@@ -1,0 +1,49 @@
+version: '3.3'
+services:
+    consul-server:
+      container_name: consul-server
+      image: consul:latest
+      ports:
+      - 8500:8500
+      command: 'agent -server -bootstrap-expect=1 -ui -bind=0.0.0.0 -client=0.0.0.0'
+      networks:
+            - microservices-network
+    userservice:
+        container_name: userservice
+        image: userservice:latest
+        ports:
+            - 3001:3001
+        links:
+            - consul-server
+        networks:
+            - microservices-network
+    deptservice:
+        container_name: deptservice
+        image: deptservice:latest
+        ports:
+            - 3002:3002
+        links:
+            - consul-server
+        networks:
+            - microservices-network
+    organizationservice:
+        container_name: organizationservice
+        image: organizationservice:latest
+        ports:
+            - 3003:3003
+        links:
+            - consul-server
+        networks:
+            - microservices-network
+    gatewayservice:
+        container_name: gatewayservice
+        image: gatewayservice:latest
+        ports:
+            - 8080:8080
+        links:
+            - consul-server
+        networks:
+            - microservices-network
+networks:
+    microservices-network:
+        driver: bridge
