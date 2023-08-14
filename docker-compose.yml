@@ -38,11 +38,11 @@ services:
     links:
       - consul
     ports:
-      - "9999:9999"
+      - "9907:9907"
     networks:
       - micro-service
     expose:
-      - 9999
+      - 9907
 
   client-one:
     restart: on-failure
